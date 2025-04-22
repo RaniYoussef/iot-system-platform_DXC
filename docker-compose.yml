@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile  # Default name used, matches correctly
+    container_name: backend-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/iot_platform
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    networks:
+      - iot-net
+
+  frontend:
+     build:
+       context: ./frontend
+       dockerfile: Dockerfile
+     container_name: angular-frontend
+     ports:
+      - "4200:80"
+     networks:
+      - iot-net
+
+
+  db:
+    image: mysql:8
+    container_name: mysql-db
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: iot_platform
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - iot-net
+
+volumes:
+  mysql-data:
+
+networks:
+  iot-net:
