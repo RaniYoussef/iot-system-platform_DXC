@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+
+  frontend:
+    build:
+      context: ./frontend-angular
+    ports:
+      - "8081:8080"
+    networks:
+      - iot-net
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/iot_system
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+    depends_on:
+      - db
+    networks:
+      - iot-net
+
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: iot_system
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - iot-net
+
+volumes:
+  mysql-data:
+
+networks:
+  iot-net:
